@@ -1,0 +1,153 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - OrderITDemo</title>
+	<script type="importmap"></script>
+
+	<link href="~/lib/leaflet/leaflet.css" rel="stylesheet" />
+	<link href="~/lib/leaflet/leaflet.min.css" rel="stylesheet" />
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Matemasie&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="~/OrderITDemo.styles.css" asp-append-version="true" />
+	<style>
+		svg:hover {
+			fill: orange;
+			transform: scale(1.4);
+			transition: 0.25s;
+		}
+
+		a:hover {
+			fill: orangered;
+			transform: scale(1.1);
+			transition: 0.25s;
+		}
+	</style>
+</head>
+<body>
+	<header>
+		<nav class="navbar  navbar-expand-md navbar-light  shadow-sm" style="background-color:darkorange;">
+			<div class="container-fluid">
+
+				<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" style="color:white;">OrderITDemo</a>
+				<button class="navbar-toggler text-dark" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+						aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+					<ul class="navbar-nav mx-auto">
+						<li class="nav-item">
+							<a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+						</li>
+						@if (User.IsInRole("Admin"))
+						{
+							@*  <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Role" asp-action="Index">Mange Roles</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">Manage User</a>
+                            </li> *@
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle text-dark" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Manage Users</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item" asp-controller="Role" asp-action="Index">Mange Roles </a>
+									<a class="dropdown-item" asp-controller="User" asp-action="Index">Manage User</a>
+									<div class="dropdown-divider"></div>
+								</div>
+							</li>
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle text-dark" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Manage Category</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item" asp-controller="Category" asp-action="Index">Show Category </a>
+									<a class="dropdown-item" asp-controller="Category" asp-action="Add">Add Category</a>
+									<div class="dropdown-divider"></div>
+								</div>
+							</li>
+							<li class="nav-item dropdown">
+								<a class="nav-link dropdown-toggle text-dark" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Manage Menu</a>
+								<div class="dropdown-menu">
+									<a class="dropdown-item" asp-controller="Menu" asp-action="Index">Show Menu </a>
+									<a class="dropdown-item" asp-controller="Menu" asp-action="Add">Add Menu</a>
+									<div class="dropdown-divider"></div>
+								</div>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="ManageOrders">Orders</a>
+							</li>
+						}
+
+						<li class="nav-item">
+							<a class="nav-link text-dark" asp-area="" asp-controller="Menu" asp-action="IndexUser">Menu</a>
+						</li>
+						@if (User.IsInRole("User"))
+						{
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Index">My Orders</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">
+									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
+										<path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+									</svg>
+								</a>
+							</li>
+						}
+						@if (User.IsInRole("Delivery"))
+						{
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="DriverIndex">Processing Orders</a>
+							</li>
+							<li class="nav-item">
+								<a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="DriverOrders">Accepted Orders</a>
+							</li>
+						}
+
+					</ul>
+					<partial name="_LoginPartial" />
+				</div>
+			</div>
+		</nav>
+	</header>
+	<div class="container mb-5">
+		<main role="main" class="pb-3">
+			@RenderBody()
+		</main>
+	</div>
+
+
+
+	<footer class="footer text-muted" style="background-color:darkorange; ">
+		<div class="container">
+			&copy; 2025 - OrderITDemo - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+			<a href="https://www.facebook.com/saad.nofal.90">  <img class="mx-3 rounded-circle Button-profile product-image" src="~/Images/Facebook.jpeg" /></a>
+			<a href="https://www.instagram.com/saad_eddin_nofal/">  <img class="rounded-circle Button-profile product-image" src="~/Images/Instagram.jpeg" /></a>
+		</div>
+	</footer>
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@await RenderSectionAsync("Scripts", required: false)
+	@* <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="staticBackdropLabel">تسجيل الدخول</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body modal-dialog-scrollable" style="background-color:#f7f7f9">
+					<partial name="_LoginPartialView"></partial>
+				</div>
+			</div>
+		</div>
+	</div> *@
+</body>
+</html>

@@ -1,0 +1,76 @@
+﻿@model AddUserViewModel
+@{
+    ViewBag.Title = "Add User";
+}
+<h2 class="text-center">@ViewBag.Title</h2>
+
+<!-- استخدام container لجعل النموذج متجاوب -->
+<div class="container">
+    <form id="registerForm" asp-action="Add" method="post">
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+        <!-- حقل البريد الإلكتروني -->
+        <div class="form-floating mb-3">
+            <input asp-for="Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+            <label asp-for="Email">Email</label>
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <!-- حقل الاسم الأول -->
+        <div class="form-floating mb-3">
+            <input asp-for="FirstName" maxlength="20" class="form-control" autocomplete="username" aria-required="true" placeholder="First Name" />
+            <label asp-for="FirstName">First Name</label>
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+
+        <!-- حقل رقم الهاتف -->
+        <div class="form-floating mb-3">
+            <input asp-for="PhoneNumber" maxlength="20" class="form-control" autocomplete="username" aria-required="true" placeholder="Phone Number" />
+            <label asp-for="PhoneNumber">Phone Number</label>
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+
+        <!-- حقل اسم المستخدم -->
+        <div class="form-floating mb-3">
+            <input asp-for="UserName" maxlength="20" class="form-control" autocomplete="username" aria-required="true" placeholder="User Name" />
+            <label asp-for="UserName">User Name</label>
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+
+        <!-- حقل كلمة المرور -->
+        <div class="form-floating mb-3">
+            <input asp-for="Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Password" />
+            <label asp-for="Password">Password</label>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <!-- حقل تأكيد كلمة المرور -->
+        <div class="form-floating mb-3">
+            <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Confirm Password" />
+            <label asp-for="ConfirmPassword">Confirm Password</label>
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <hr />
+
+        <!-- عرض الأدوار -->
+        <h6>Roles</h6>
+        @for (int i = 0; i < Model.Roles.Count; i++)
+        {
+            <div class="form-check m-1">
+                <input type="hidden" asp-for="@Model.Roles[i].RoleName" />
+                <input asp-for="@Model.Roles[i].IsSelected" class="form-check-input" />
+                <label asp-for="@Model.Roles[i].IsSelected" class="form-check-label">@Model.Roles[i].RoleName</label>
+            </div>
+        }
+        <span asp-validation-for="Roles"></span>
+
+        <!-- زر الإرسال -->
+        <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary mt-3">Save</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

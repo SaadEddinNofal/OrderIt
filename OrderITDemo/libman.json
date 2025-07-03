@@ -1,0 +1,17 @@
+{
+  "version": "3.0",
+  "defaultProvider": "cdnjs",
+  "libraries": [
+    {
+      "library": "bootbox.js@6.0.0",
+      "destination": "wwwroot/lib/bootbox.js/",
+      "files": [
+        "bootbox.min.js"
+      ]
+    },
+    {
+      "library": "leaflet@1.9.4",
+      "destination": "wwwroot/lib/leaflet/"
+    }
+  ]
+}

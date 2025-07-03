@@ -1,0 +1,156 @@
+﻿@model IEnumerable<Category>
+@{
+    ViewBag.Title = "The Menu";
+}
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .bkimg {
+        width: 100%;
+        height: auto;
+        opacity: 0.1;
+    }
+
+    h2 {
+        color: #2c3e50;
+        font-family: 'Simplified Arabic Fixed', Arial, sans-serif;
+        font-weight: bolder;
+        padding: 20px 0;
+    }
+
+    hr {
+        border-color: #bdc3c7; 
+        width: 90%;
+        border-width: 4px;
+        margin: 20px auto;
+    }
+    .card {
+        border-radius: 15px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-body {
+        background-color: #ffffff; 
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: space-between;
+    }
+
+    .btn-outline-primary {
+        color: #2980b9;
+        border-color: #2980b9;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #2980b9;
+        color: #fff;
+    }
+
+    .btn-outline-danger {
+        color: #c0392b;
+        border-color: #c0392b;
+    }
+
+    .btn-outline-danger:hover {
+        background-color: #c0392b;
+        color: #fff;
+    }
+
+    /* Footer styles */
+    .footer {
+        background: #222;
+        color: #fff;
+        padding: 18px 0 12px 0;
+        text-align: center;
+        font-size: 1rem;
+        letter-spacing: 1px;
+        width: 100%;
+        margin-top: 40px;
+        border-top: 3px solid #2980b9;
+        position: relative;
+        bottom: 0;
+        left: 0;
+    }
+    .footer a {
+        color: #2980b9;
+        text-decoration: none;
+        margin: 0 8px;
+    }
+    .footer a:hover {
+        text-decoration: underline;
+        color: #fff;
+    }
+</style>
+
+<div dir="rtl" class="container py-4">
+
+    <img class="bkimg mb-4" src="~/Images/FoodLogo.png" />
+
+    @foreach (var menu in Model)
+    {
+        <h2 class="text-center">@menu.Name</h2>
+        <hr />
+
+        <div class="row g-4 justify-content-center">
+            @foreach (var m in menu.Menu)
+            {
+                if (m.IsExist)
+                {
+                    <div class="col-lg-3 col-md-4 col-sm-6 d-flex align-items-stretch">
+                        <div class="card shadow-lg w-100 mb-4">
+                            @if (m.ItemPicture != null)
+                            {
+                                <img src="data:image/*;base64,@(Convert.ToBase64String(m.ItemPicture))" class="product-image" alt="صورة للمنتج" />
+                            }
+                            else
+                            {
+                                <img src="~/Images/EmptyPlate.jpg" class="product-image" alt="صحن فارغ" />
+                            }
+
+                            <div class="card-body">
+                                <h4 class="card-title mb-2">@m.Name</h4>
+                                <p class="card-text">@m.Description</p>
+                                <p class="text-danger font-weight-bold" style="font-size:1.2em;">@m.Price ل.س</p>
+                                <div class="mt-3 d-flex flex-wrap gap-2 justify-content-between">
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <div>
+                                            <p class="mb-2 text-muted">متوفر: @m.IsExist</p>
+                                            <a asp-action="Add" asp-controller="Menu" class="btn btn-outline-primary btn-sm" asp-route-id="@m.MenuId">تعديل</a>
+                                            <a asp-action="Delete" asp-controller="Menu" class="btn btn-outline-danger btn-sm" asp-route-id="@m.MenuId">حذف</a>
+                                        </div>
+                                    }
+                                    @if (User.IsInRole("User") || !User.Identity.IsAuthenticated)
+                                    {
+                                        <a asp-action="AddToCart" asp-controller="Cart" class="btn btn-outline-primary btn-sm" asp-route-menuId="@m.MenuId">إضافة إلى السلة</a>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+        <hr />
+    }
+</div>
+
+<footer class="footer">
+    &copy; @DateTime.Now.Year OrderIT | Developed by
+    <a href="mailto:sarg10nofal10@gmail.com">Support</a>
+    | جميع الحقوق محفوظة
+</footer>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}  

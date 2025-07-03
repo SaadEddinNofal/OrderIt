@@ -1,0 +1,97 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+<style>
+   
+    .top-section {
+        background: url('/Images/HomeBk.jpg') center center/cover no-repeat;
+        height: 100vh; /* تأكد من أن القسم العلوي يملأ الشاشة بالكامل */
+        width: 100%; /* تغطية العرض بالكامل */
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+     
+    }
+
+        .top-section img.logo {
+            width: 180px;
+            margin-bottom: 1rem;
+        }
+
+    .btn-login {
+        font-size: 1.2rem;
+        padding: 0.6rem 2rem;
+        margin-top: 1rem;
+    }
+
+    .bottom-section {
+        background-color: #f8f9fa;
+        padding: 4rem 1rem;
+    }
+
+    .info-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .info-box {
+        flex: 1 1 400px;
+        max-width: 600px;
+        text-align: center;
+    }
+
+        .info-box img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+    h1, h2 {
+        font-family: 'Roboto', sans-serif;
+        font-weight: 700;
+    }
+
+   
+
+    
+</style>
+
+<!-- Section 1: Full Background + Logo + Button -->
+<div class="top-section">
+    <img src="~/Images/Logo3.png" class="logo" alt="Logo" />
+    <h1 class="display-5">Welcome To OrderIT</h1>
+    <p class="lead">Discover restaurants and more near you.</p>
+    <a class="btn btn-light btn-login" asp-area="Identity" asp-page="/Account/Login">Login</a>
+</div>
+
+<!-- Section 2: Two Columns for Dasher + Sign Up -->
+<div class="bottom-section">
+    <div class="container">
+        <div class="info-row">
+            <!-- Dasher Info -->
+            <div class="info-box">
+                <img src="~/Images2/Delivery.jpg" alt="Become a Dasher" />
+                <h2 class="mt-3">Become a Dasher</h2>
+                <p>Make money and work on your schedule. Contact us:</p>
+                <p class="text-danger fw-bold">sarg10nofal10@gmail.com<br />0993735995</p>
+            </div>
+
+            <!-- Sign Up Info -->
+            <div class="info-box">
+                <img src="~/Images2/Phone.png" alt="Use the Website" />
+                <h2 class="mt-3">Use the Website</h2>
+                <p>Experience the best your neighborhood has to offer, all in one app.</p>
+                <a class="btn btn-outline-danger btn-lg" asp-area="Identity" asp-page="/Account/Register">Sign Up</a>
+            </div>
+        </div>
+    </div>
+</div>

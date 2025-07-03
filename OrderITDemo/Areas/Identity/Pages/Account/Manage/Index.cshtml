@@ -1,0 +1,61 @@
+﻿@page
+@model IndexModel
+@{
+	ViewData["Title"] = "Profile";
+	ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<h3 style="">@ViewData["Title"]</h3>
+ <partial name="_StatusMessage" for="StatusMessage" /> 
+<form id="profile-form" method="post" enctype="multipart/form-data">
+	<div class="row">
+		<div class="col-md-6 shadow-lg">
+
+			<div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+			<div class="form-floating mb-3">
+				<input asp-for="Username" class="form-control" placeholder="Please choose your username." disabled />
+				<label asp-for="Username" class="form-label"></label>
+			</div>
+			<div class="form-floating mb-3">
+				<input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your Phone Number ." />
+				<label asp-for="Input.PhoneNumber" class="form-label"></label>
+				<span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+			</div>
+			<div class="form-floating mb-3">
+				<input asp-for="Input.FirstName" class="form-control" placeholder="Please enter your First Name." />
+				<label asp-for="Input.FirstName" class="form-label"></label>
+				<span asp-validation-for="Input.FirstName" class="text-danger"></span>
+			</div>
+			
+			<button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+
+		</div>
+		<div class="col-md-6">
+			<div class="form-floating" >
+				@if (Model.Input.ProfilePicture != null)
+				{
+					<img id="ProfilePicture" alt="Profile" src="data:image/*;base64,@(Convert.ToBase64String(Model.Input.ProfilePicture))" class="Profile-Picture" />
+				}
+				else
+				{
+					<img id="ProfilePicture" alt="Profile" src="~/Images/Profile.jpg" class="Profile-Picture" />
+				}
+			</div>
+			<div class="mt-2 ">
+				<input type="file"
+					accept="image/*"
+					asp-for="Input.ProfilePicture"
+					class="input-group"
+					   onchange="document.getElementById('ProfilePicture').src = window.URL.createObjectURL(this.files[0])" />
+					<label asp-for="Input.ProfilePicture">Choose picture</label>
+				<span asp-validation-for="Input.ProfilePicture" class="text-danger"></span>
+			</div>
+		</div>
+	</div>
+
+</form>
+
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

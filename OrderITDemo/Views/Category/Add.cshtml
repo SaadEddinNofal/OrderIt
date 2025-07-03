@@ -1,0 +1,36 @@
+﻿@model Category
+
+@{
+    ViewData["Title"] = "Add Category";
+}
+
+<div class="container mt-5">
+    <form method="post" asp-action="Add" asp-controller="Category">
+        <div class="p-4 shadow-lg rounded" style="background-color: darkmagenta;">
+            <h2 class="text-white text-center">@ViewData["Title"]</h2>
+            <hr class="bg-light" />
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input asp-for="Name" class="form-control" aria-required="true" placeholder="Category Name" />
+                        <label asp-for="Name">Name</label>
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-12">
+                    <div class="form-floating mb-3">
+                        <textarea asp-for="Description" class="form-control" aria-required="true" placeholder="Description" style="height: 100px;"></textarea>
+                        <label asp-for="Description">Description</label>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-light px-4">Save</button>
+            </div>
+        </div>
+    </form>
+</div>

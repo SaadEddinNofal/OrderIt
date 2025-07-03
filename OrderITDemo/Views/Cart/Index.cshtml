@@ -1,0 +1,252 @@
+﻿@model CartViewModel
+
+<style>
+    .cart-bg {
+        min-height: 100vh;
+        background: linear-gradient(rgba(255,255,255,0.92), rgba(255,255,255,0.92)), url('../Images/BKORANGE.jpg') center center/cover no-repeat;
+        padding: 2rem 0;
+    }
+
+    .cart-container {
+        max-width: 900px;
+        margin: 0 auto;
+    }
+
+    .cart-row {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+        justify-content: center;
+    }
+
+    .cart-card {
+        display: flex;
+        align-items: center;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.10);
+        padding: 1.2rem 2rem;
+        margin-bottom: 0.3rem;
+        min-width: 260px;
+        max-width: 100%;
+        width: 100%;
+        transition: box-shadow 0.2s;
+        gap: 1.2rem;
+        height: 100px;
+        overflow-x: auto;
+    }
+
+        .cart-card:hover {
+            box-shadow: 0 4px 24px rgba(0,0,0,0.13);
+        }
+
+    .cart-img {
+        border-radius: 10px;
+        width: 56px;
+        height: 56px;
+        object-fit: cover;
+        background: #f8f9fa;
+        margin-right: 0.7rem;
+    }
+
+    .cart-title {
+        font-size: 0.98rem;
+        font-weight: 600;
+        color: #1a237e;
+        margin-right: 1rem;
+        white-space: nowrap;
+        min-width: 90px;
+        max-width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .cart-meta {
+        color: #555;
+        font-size: 0.92rem;
+        margin-right: 1rem;
+        white-space: nowrap;
+    }
+
+    .cart-actions {
+        display: flex;
+        flex-direction: row;
+        gap: 0.3rem;
+        margin-left: auto;
+    }
+
+        .cart-actions .btn {
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+    .order-form {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        padding: 1.2rem 1rem 1rem 1rem;
+        margin-bottom: 1.5rem;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+        .order-form .form-floating {
+            margin-bottom: 0.7rem;
+        }
+
+        .order-form button {
+            font-size: 1.08rem;
+            font-weight: 500;
+            padding: 0.7rem 0;
+            border-radius: 8px;
+        }
+
+    #map {
+        width: 100%;
+        max-width: 900px;
+        height: 240px;
+        border-radius: 10px;
+        margin: 0 auto 1.5rem auto;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .empty-cart-img {
+        max-width: 320px;
+        width: 90vw;
+        margin: 2rem auto 1.5rem auto;
+        display: block;
+    }
+
+    
+        .cart-card
+
+    {
+        font-size: 0.92rem;
+        padding: 0.7rem 0.5rem;
+        height: auto;
+        flex-wrap: wrap;
+    }
+
+    .cart-title, .cart-meta {
+        margin-right: 0.5rem;
+        min-width: 60px;
+        max-width: 90px;
+    }
+
+    .cart-img {
+        width: 38px;
+        height: 38px;
+    }
+
+    
+</style>
+
+<div class="cart-bg">
+    @if (Model != null)
+    {
+        <div class="cart-container">
+            <div class="cart-row">
+                @foreach (var cart in Model.Carts)
+                {
+                    <div class="cart-card">
+                        @if (cart.Menu.ItemPicture != null)
+                        {
+                            <img class="cart-img" alt="Product" src="data:image/*;base64,@(Convert.ToBase64String(cart.Menu.ItemPicture))" />
+                        }
+                        else
+                        {
+                            <img class="cart-img" alt="Product" src="~/Images/EmptyPlate.jpg" />
+                        }
+                        <span class="cart-title">@cart.Menu.Name</span>
+                        <span class="cart-meta">@cart.Menu.Price ل.س</span>
+                        <span class="cart-meta">@cart.Quantity قطع</span>
+                        <span class="cart-meta">@cart.TotalPrice ل.س</span>
+                        <div class="cart-actions">
+                            <a asp-action="AddToCart" asp-route-tot="@(cart.Menu.Price* cart.Quantity)" asp-controller="Cart" asp-route-cartId="@cart.CartItemId" asp-route-menuId="@cart.MenuId" class="btn btn-success" title="Add">
+                                <i class="bi bi-plus-square"></i>
+                            </a>
+                            <a asp-action="Minus" asp-controller="Cart" asp-route-cartId="@cart.CartItemId" asp-route-menuId="@cart.MenuId" class="btn btn-warning" title="Minus">
+                                <i class="bi bi-dash-square"></i>
+                            </a>
+                            <a asp-action="Delete" asp-controller="Cart" asp-route-id="@cart.CartItemId" class="btn btn-danger" title="Remove">
+                                <i class="bi bi-trash3"></i>
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <form method="post" asp-action="AddOrder" asp-controller="Order" class="order-form">
+                <div class="form-floating">
+                    <input asp-for="Address" id="addressInput" class="form-control" autocomplete="username" aria-required="true" placeholder="" required />
+                    <label asp-for="Address">Address</label>
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-dark w-100">Order</button>
+                </div>
+            </form>
+
+            <div id="map" class="mb-4"></div>
+        </div>
+        <script src="~/lib/leaflet/leaflet.js"></script>
+        <script src="~/lib/leaflet/leaflet.min.js"></script>
+        <script>
+            var map = L.map('map').setView([32.0213, 35.0], 8);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            var marker;
+
+            function setAddressFromCoords(lat, lng) {
+                // Use Nominatim API for reverse geocoding
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data && data.display_name) {
+                            document.getElementById('addressInput').value = data.display_name;
+                        } else {
+                            document.getElementById('addressInput').value = lat + ', ' + lng;
+                        }
+                    })
+                    .catch(() => {
+                        document.getElementById('addressInput').value = lat + ', ' + lng;
+                    });
+            }
+
+            map.on('click', function (e) {
+                var lat = e.latlng.lat;
+                var lng = e.latlng.lng;
+
+                if (marker) {
+                    marker.setLatLng(e.latlng);
+                } else {
+                    marker = L.marker(e.latlng, { draggable: true }).addTo(map);
+                    marker.on('dragend', function (event) {
+                        var position = event.target.getLatLng();
+                        setAddressFromCoords(position.lat, position.lng);
+                    });
+                }
+                setAddressFromCoords(lat, lng);
+            });
+        </script>
+    }
+    else
+    {
+        <div style="text-align:center">
+            <img src="~/Images/empty-cart.png" class="empty-cart-img" alt="Empty Cart" />
+            <h3 class="mt-3 text-secondary">Your cart is empty</h3>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

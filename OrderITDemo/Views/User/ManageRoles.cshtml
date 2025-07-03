@@ -1,0 +1,38 @@
+﻿@model UserRolesViewModel
+
+@{
+	ViewBag.Title = "Manage Roles";
+}
+
+<div class="container mt-5">
+	<div class="row justify-content-center">
+		<div class="col-md-8 col-lg-6">
+			<form method="post">
+				<div class="card shadow-lg border-0 rounded-4">
+					<div class="card-header bg-primary text-white text-center rounded-top-4">
+						<h3>@ViewBag.Title</h3>
+						<p class="mb-0">@Model.UserName</p>
+					</div>
+					<div class="card-body bg-light">
+						<input type="hidden" asp-for="UserId" />
+
+						@for (int i = 0; i < Model.Roles.Count; i++)
+						{
+							<div class="form-check mb-2">
+								<input type="hidden" asp-for="@Model.Roles[i].RoleName" />
+								<input asp-for="@Model.Roles[i].IsSelected" class="form-check-input" />
+								<label asp-for="@Model.Roles[i].IsSelected" class="form-check-label">@Model.Roles[i].RoleName</label>
+							</div>
+						}
+
+						<div asp-validation-summary="All" class="text-danger mt-2"></div>
+					</div>
+					<div class="card-footer bg-white text-center">
+						<button type="submit" class="btn btn-primary px-4 mx-2">Save</button>
+						<a asp-action="Index" class="btn btn-outline-dark px-4 mx-2">Cancel</a>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

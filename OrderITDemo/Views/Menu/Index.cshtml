@@ -1,0 +1,74 @@
+﻿@model IEnumerable<Category>
+@{
+    ViewBag.Title = "The Menu";
+}
+
+<!-- أضف هنا CSS مخصص لتنسيق الصفحة -->
+<style>
+    /* جميع البطاقات ذات ارتفاع موحد لتوحيد الاحجام */
+    .card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    /* محتوى البطاقة يتوزع بشكل متساوي */
+    .card-body {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    /* الصورة تكون بابعاد ثابتة وتغطي الحاوية */
+   
+
+  </style>
+
+<div dir="rtl" class="shadow-lg row">
+    <img src="~/Images/FoodLogo.png" class="bkimg" style="opacity:0.17; width:100%; height:auto;" />
+
+    @foreach (var menu in Model)
+    {
+        <h2 class="text-md-center" style="color:black; font-family:'Simplified Arabic Fixed'; font-weight:bolder;">@menu.Name</h2>
+        <hr style="border-color:black; width:90%; border-width:5px" />
+
+        <div class="row g-3">
+            @foreach (var m in menu.Menu)
+            {
+                <div class="col-lg-3 col-md-4 col-sm-6" style="background-color:transparent;">
+                    <div class="card mb-4 shadow-lg d-flex flex-column h-100">
+                        @if (m.ItemPicture != null)
+                        {
+                            <img class="product-image shadow-lg" alt="Profile" src="data:image/*;base64,@(Convert.ToBase64String(m.ItemPicture))" />
+                        }
+                        else
+                        {
+                            <img class="product-image shadow-lg" alt="Profile" src="~/Images/EmptyPlate.jpg" />
+                        }
+                        <div class="card-body d-flex flex-column justify-content-between" style="background-color:white;">
+                            <div>
+                                <h3>@m.Name</h3>
+                                <p>@m.Description</p>
+                                <p style="color:orangered">@m.Price ل.س</p>
+                            </div>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div>
+                                    <p>@m.IsExist</p>
+                                    <a asp-action="Add" asp-controller="Menu" class="btn btn-outline-primary" asp-route-id="@m.MenuId">Edit</a>
+                                    <a asp-action="Delete" asp-controller="Menu" class="btn btn-outline-danger" asp-route-id="@m.MenuId">Delete</a>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <hr style="border-color:black; width:90%; border-width:5px" />
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}  

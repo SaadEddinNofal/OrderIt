@@ -1,0 +1,55 @@
+﻿@model FileProfileViewModel
+@{
+	ViewBag.Title = "Edit Profile";
+}
+
+<div class="container mt-5">
+	<div class="row justify-content-center">
+		<div class="col-md-8 col-lg-6">
+			<div class="card shadow-lg border-0 rounded-4">
+				<div class="card-header bg-primary text-white text-center rounded-top-4">
+					<h2>@ViewBag.Title</h2>
+				</div>
+				<div class="card-body p-4 bg-light rounded-bottom-4">
+
+					<form id="registerForm" asp-action="Edit" method="post">
+						<input type="hidden" asp-for="Id" />
+
+						<div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+						<div class="form-floating mb-3">
+							<input asp-for="Email" class="form-control" autocomplete="username" placeholder="name@example.com" />
+							<label asp-for="Email">Email</label>
+							<span asp-validation-for="Email" class="text-danger"></span>
+						</div>
+
+						<div class="form-floating mb-3">
+							<input asp-for="FirstName" maxlength="20" class="form-control" placeholder="First Name" />
+							<label asp-for="FirstName">First Name</label>
+							<span asp-validation-for="FirstName" class="text-danger"></span>
+						</div>
+
+						<div class="form-floating mb-3">
+							<input asp-for="PhoneNumber" maxlength="20" class="form-control" placeholder="Phone Number" />
+							<label asp-for="PhoneNumber">Phone Number</label>
+							<span asp-validation-for="PhoneNumber" class="text-danger"></span>
+						</div>
+
+						<div class="form-floating mb-3">
+							<input asp-for="UserName" maxlength="20" class="form-control" placeholder="User Name" />
+							<label asp-for="UserName">User Name</label>
+							<span asp-validation-for="UserName" class="text-danger"></span>
+						</div>
+
+						<button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary mt-3 shadow-sm">Save</button>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}
