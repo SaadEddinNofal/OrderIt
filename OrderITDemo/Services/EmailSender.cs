@@ -9,7 +9,7 @@ namespace OrderITDemo.Services
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
             var fromMail = "sarg10nofal10@gmail.com";
-            var fromPassword = "ebhqwsumzrqjkejq"; // من الأفضل استخدام كلمة مرور للتطبيق هنا  
+            var fromPassword = "REDACTED_SMTP_PASSWORD"; // من الأفضل استخدام كلمة مرور للتطبيق هنا  
             var message = new MailMessage
             {
                 From = new MailAddress(fromMail),
