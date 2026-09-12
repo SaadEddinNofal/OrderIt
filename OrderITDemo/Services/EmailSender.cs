@@ -1,79 +1,46 @@
 ﻿using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
 
 namespace OrderITDemo.Services
 {
-    public class EmailSender :  IEmailSender
+    public class EmailSender : IEmailSender
     {
+        private readonly IConfiguration _configuration;
+
+        public EmailSender(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            var fromMail = "sarg10nofal10@gmail.com";
-            var fromPassword = "REDACTED_SMTP_PASSWORD"; // من الأفضل استخدام كلمة مرور للتطبيق هنا  
+            var fromMail = _configuration["EmailSettings:Username"];
+            var fromPassword = _configuration["EmailSettings:Password"];
+            var smtpServer = _configuration["EmailSettings:SmtpServer"];
+            var smtpPort = int.Parse(_configuration["EmailSettings:Port"] ?? "587");
+            var enableSsl = bool.Parse(_configuration["EmailSettings:EnableSsl"] ?? "true");
+
             var message = new MailMessage
             {
                 From = new MailAddress(fromMail),
                 Subject = subject,
                 Body = $"<html><body>{htmlMessage}</body></html>",
                 IsBodyHtml = true,
-                            };
+            };
             message.To.Add(email);
 
-            using (var smtpClient = new SmtpClient("smtp.gmail.com")) // تأكد من أن هذا هو خادم SMTP الصحيح  
+            using (var smtpClient = new SmtpClient(smtpServer))
             {
-                smtpClient.Port = 587; // المنفذ المناسب  
+                smtpClient.Port = smtpPort;
                 smtpClient.Credentials = new NetworkCredential(fromMail, fromPassword);
-                smtpClient.EnableSsl = true;
+                smtpClient.EnableSsl = enableSsl;
                 smtpClient.DeliveryMethod = SmtpDeliveryMethod.Network;
                 smtpClient.UseDefaultCredentials = false;
 
-                await smtpClient.SendMailAsync(message); // استخدم SendMailAsync  
+                await smtpClient.SendMailAsync(message);
             }
         }
-        /*using System;
-        using System.Threading.Tasks;
-        using MailKit.Net.Smtp;
-        using MimeKit;*/
-
-        /*public class EmailSender
-        {
-            public async Task SendEmailAsync(string email, string subject, string htmlMessage)
-            {
-                var message = new MimeMessage();
-                message.From.Add(new MailboxAddress("Your Name", "your_email@gmail.com")); // وضع اسمك وعنوان بريدك الإلكتروني هنا  
-                message.To.Add(new MailboxAddress("", email)); // البريد الإلكتروني المستلم  
-                message.Subject = subject;
-
-                var bodyBuilder = new BodyBuilder
-                {
-                    HtmlBody = htmlMessage
-                };
-                message.Body = bodyBuilder.ToMessageBody();
-
-                using (var client = new SmtpClient())
-                {
-                    try
-                    {
-                        // الاتصال بخادم SMTP Gmail  
-                        await client.ConnectAsync("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
-
-                        // استخدام اسم المستخدم وكلمة المرور الخاصة بك  
-                        await client.AuthenticateAsync("sarg10nofal10@gmail.com", "your_app_passwor");
-
-                        // إرسال الرسالة  
-                        await client.SendAsync(message);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine("Error occurred while sending email: " + ex.Message);
-                    }
-                    finally
-                    {
-                        // قطع الاتصال بالخادم  
-                        await client.DisconnectAsync(true);
-                    }
-                }
-            }
-        }*/
     }
 }
