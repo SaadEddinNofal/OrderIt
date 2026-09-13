@@ -1,36 +1,52 @@
 ﻿@model Category
 
 @{
-    ViewData["Title"] = "Add Category";
+    
+	Layout = "_AdminLayout";
+	ViewData["Title"] = "Add Category";
+
 }
 
-<div class="container mt-5">
-    <form method="post" asp-action="Add" asp-controller="Category">
-        <div class="p-4 shadow-lg rounded" style="background-color: darkmagenta;">
-            <h2 class="text-white text-center">@ViewData["Title"]</h2>
-            <hr class="bg-light" />
+<div class="page-wrap">
+	<div class="container py-5">
+		<div class="row justify-content-center">
+			<div class="col-lg-6 col-md-8">
+				<div class="form-card">
+					<div class="form-card-header">
+						<h1 class="h4 mb-0">@ViewData["Title"]</h1>
+					</div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    <div class="form-floating mb-3">
-                        <input asp-for="Name" class="form-control" aria-required="true" placeholder="Category Name" />
-                        <label asp-for="Name">Name</label>
-                        <span asp-validation-for="Name" class="text-danger"></span>
-                    </div>
-                </div>
+					<form method="post" asp-action="Add" asp-controller="Category">
+						<div class="form-card-body">
+							<div class="row g-3">
+								<div class="col-12">
+									<div class="form-floating">
+										<input asp-for="Name" class="form-control" aria-required="true" placeholder="Category Name" />
+										<label asp-for="Name">Name</label>
+										<span asp-validation-for="Name" class="text-danger"></span>
+									</div>
+								</div>
+								<div class="col-12">
+									<div class="form-floating">
+										<textarea asp-for="Description" class="form-control" aria-required="true" placeholder="Description" style="height: 100px;"></textarea>
+										<label asp-for="Description">Description</label>
+										<span asp-validation-for="Description" class="text-danger"></span>
+									</div>
+								</div>
+							</div>
+						</div>
 
-                <div class="col-md-12">
-                    <div class="form-floating mb-3">
-                        <textarea asp-for="Description" class="form-control" aria-required="true" placeholder="Description" style="height: 100px;"></textarea>
-                        <label asp-for="Description">Description</label>
-                        <span asp-validation-for="Description" class="text-danger"></span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-center">
-                <button type="submit" class="btn btn-light px-4">Save</button>
-            </div>
-        </div>
-    </form>
+						<div class="form-card-footer d-flex justify-content-end gap-2">
+							<a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+							<button type="submit" class="btn btn-primary px-4">Save</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

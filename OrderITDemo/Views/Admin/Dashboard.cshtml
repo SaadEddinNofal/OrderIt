@@ -1,0 +1,74 @@
+@model OrderITDemo.ViewModels.DashboardViewModel
+@{
+	ViewData["Title"] = "Dashboard";
+}
+
+<div class="admin-content-header">
+	<h1>@ViewData["Title"]</h1>
+	<p class="admin-content-subtitle">Welcome back, @User.Identity?.Name. Here is the current state of @ViewBag.SiteName.</p>
+</div>
+
+<div class="dash-grid">
+	<div class="dash-card">
+		<div class="dash-icon dash-icon-primary"><i class="bi bi-people"></i></div>
+		<h3>@Model.TotalUsers</h3>
+		<p class="dash-meta">Registered Users</p>
+		<a class="dash-link" asp-controller="User" asp-action="Index">Manage Users <i class="bi bi-arrow-right"></i></a>
+	</div>
+
+	<div class="dash-card">
+		<div class="dash-icon dash-icon-accent"><i class="bi bi-collection"></i></div>
+		<h3>@Model.TotalCategories</h3>
+		<p class="dash-meta">Categories</p>
+		<a class="dash-link" asp-controller="Category" asp-action="Index">Manage Categories <i class="bi bi-arrow-right"></i></a>
+	</div>
+
+	<div class="dash-card">
+		<div class="dash-icon dash-icon-success"><i class="bi bi-grid"></i></div>
+		<h3>@Model.TotalMenuItems</h3>
+		<p class="dash-meta">Menu Items</p>
+		<a class="dash-link" asp-controller="Menu" asp-action="Index">Manage Menu <i class="bi bi-arrow-right"></i></a>
+	</div>
+
+	<div class="dash-card">
+		<div class="dash-icon dash-icon-warning"><i class="bi bi-box-seam"></i></div>
+		<h3>@Model.TotalOrders</h3>
+		<p class="dash-meta">Orders</p>
+		<a class="dash-link" asp-controller="Order" asp-action="ManageOrders">Manage Orders <i class="bi bi-arrow-right"></i></a>
+	</div>
+
+	<div class="dash-card">
+		<div class="dash-icon dash-icon-primary"><i class="bi bi-clock-history"></i></div>
+		<h3>@(Model.PendingOrders)<span class="dash-suffix">+@(Model.ProcessingOrders)</span></h3>
+		<p class="dash-meta">Pending + Processing</p>
+		<a class="dash-link" asp-controller="Order" asp-action="ManageOrders">View Orders <i class="bi bi-arrow-right"></i></a>
+	</div>
+
+	<div class="dash-card">
+		<div class="dash-icon dash-icon-accent"><i class="bi bi-bicycle"></i></div>
+		<h3>@Model.UnderDeliveryOrders</h3>
+		<p class="dash-meta">Under Delivery</p>
+		@if (User.IsInRole("Delivery"))
+		{
+			<a class="dash-link" asp-controller="Order" asp-action="DriverOrders">My Deliveries <i class="bi bi-arrow-right"></i></a>
+		}
+		else
+		{
+			<a class="dash-link" asp-controller="Order" asp-action="DriverIndex">Processing <i class="bi bi-arrow-right"></i></a>
+		}
+	</div>
+
+	<div class="dash-card">
+		<div class="dash-icon dash-icon-success"><i class="bi bi-check2-circle"></i></div>
+		<h3>@Model.DeliveredOrders</h3>
+		<p class="dash-meta">Delivered</p>
+		<a class="dash-link" asp-controller="Order" asp-action="ManageOrders">View Orders <i class="bi bi-arrow-right"></i></a>
+	</div>
+
+	<div class="dash-card">
+		<div class="dash-icon dash-icon-danger"><i class="bi bi-x-circle"></i></div>
+		<h3>@Model.CancelledOrders</h3>
+		<p class="dash-meta">Cancelled</p>
+		<a class="dash-link" asp-controller="Order" asp-action="ManageOrders">Review <i class="bi bi-arrow-right"></i></a>
+	</div>
+</div>

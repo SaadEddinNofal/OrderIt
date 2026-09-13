@@ -5,97 +5,54 @@
     ViewData["Title"] = "Log in";
 }
 
-<style>
-    body {
-        background-image: url('../Images/pizzaBk.jpg');
-        font-family: Roboto, Arial, sans-serif;
-        background-size: cover;
-        background-position: center;
-        min-height: 100vh;
-    }
+<div class="auth-page">
+	<div class="auth-card">
+		<div class="auth-brand">
+			<img src="~/Images/FoodLogo.png" alt="OrderIt logo" />
+			<h1 class="auth-title">OrderIt</h1>
+			<p class="auth-subtitle">Welcome back! Log in to continue.</p>
+		</div>
 
-    .container-login {
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 0;
-    }
+		<section>
+			<form id="account" method="post">
+				<div asp-validation-summary="ModelOnly" class="text-danger small mb-2" role="alert"></div>
 
-    .account-box {
-        background: rgba(255,255,255,0.95);
-        border-radius: 16px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.12);
-        padding: 2rem 2.5rem;
-        max-width: 400px;
-        width: 100%;
-        margin: 0 auto;
-    }
+				<div class="form-floating mb-3">
+					<input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+					<label asp-for="Input.Email" class="form-label">Email</label>
+					<span asp-validation-for="Input.Email" class="text-danger small"></span>
+				</div>
+				<div class="form-floating mb-3">
+					<input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
+					<label asp-for="Input.Password" class="form-label">Password</label>
+					<span asp-validation-for="Input.Password" class="text-danger small"></span>
+				</div>
+				<div class="form-check mb-3">
+					<input class="form-check-input" asp-for="Input.RememberMe" />
+					<label asp-for="Input.RememberMe" class="form-check-label">
+						@Html.DisplayNameFor(m => m.Input.RememberMe)
+					</label>
+				</div>
+				<div>
+					<button id="login-submit" type="submit" class="w-100 btn btn-primary btn-lg mb-3">Log in</button>
+				</div>
+			</form>
+		</section>
 
-    .blurred-image {
-        display: none;
-    }
-
-    label {
-        color: orangered;
-    }
-  
-    .account-box
-    {
-        padding: 1rem 0.5rem;
-        max-width: 100%;
-    }
-
-    h3 {
-        font-size: 2rem !important;
-    }
-
-    
-</style>
-
-<div class="container-login">
-    <div class="account-box text-center">
-        <h3 style="font-family:Roboto; font-size:2.5rem; text-shadow: 1px 2px 7px rgba(0, 0, 0, 0.1); color: darkorange;" class="fw-bold mb-4">OrderIt</h3>
-        <section>
-            <form id="account" method="post">
-                <h2 class="mb-3" style="font-size:1.25rem;">Use a local account to log in.</h2>
-                <hr />
-                <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                <div class="form-floating mb-2">
-                    <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="" />
-                    <label asp-for="Input.Email" class="form-label">Email</label>
-                    <span asp-validation-for="Input.Email" class="text-danger"></span>
-                </div>
-                <div class="form-floating mb-2">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="" />
-                    <label asp-for="Input.Password" class="form-label">Password</label>
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="form-check mb-2 text-start">
-                    <input class="form-check-input" asp-for="Input.RememberMe" />
-                    <label asp-for="Input.RememberMe" class="form-check-label">
-                        @Html.DisplayNameFor(m => m.Input.RememberMe)
-                    </label>
-                </div>
-                <div>
-                    <button id="login-submit" type="submit" style="background-color:darkorange;color:white;" class="w-100 btn btn-lg mb-2 shadow text-center">Log in</button>
-                </div>
-                <div>
-                    <p class="mb-1">
-                        <a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p class="mb-1">
-                        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
-                </div>
-            </form>
-        </section>
-    </div>
+		<div class="auth-links text-center small">
+			<p class="mb-1">
+				<i class="bi bi-shield-lock me-1"></i><a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
+			</p>
+			<p class="mb-0">
+				Don't have an account? <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
+			</p>
+			<p class="mb-0">
+				<a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
+			</p>
+		</div>
+	</div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+	<partial name="_ValidationScriptsPartial" />
 }

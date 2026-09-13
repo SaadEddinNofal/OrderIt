@@ -1,38 +1,43 @@
 ﻿@model UserRolesViewModel
 
 @{
+	
+	Layout = "_AdminLayout";
 	ViewBag.Title = "Manage Roles";
+
 }
 
-<div class="container mt-5">
-	<div class="row justify-content-center">
-		<div class="col-md-8 col-lg-6">
-			<form method="post">
-				<div class="card shadow-lg border-0 rounded-4">
-					<div class="card-header bg-primary text-white text-center rounded-top-4">
-						<h3>@ViewBag.Title</h3>
-						<p class="mb-0">@Model.UserName</p>
-					</div>
-					<div class="card-body bg-light">
-						<input type="hidden" asp-for="UserId" />
+<div class="page-wrap">
+	<div class="container py-5">
+		<div class="row justify-content-center">
+			<div class="col-lg-6 col-md-8">
+				<form method="post">
+					<div class="form-card">
+						<div class="form-card-header">
+							<h1 class="h4 mb-1">@ViewBag.Title</h1>
+							<p class="page-subtitle mb-0">@Model.UserName</p>
+						</div>
+						<div class="form-card-body">
+							<input type="hidden" asp-for="UserId" />
 
-						@for (int i = 0; i < Model.Roles.Count; i++)
-						{
-							<div class="form-check mb-2">
-								<input type="hidden" asp-for="@Model.Roles[i].RoleName" />
-								<input asp-for="@Model.Roles[i].IsSelected" class="form-check-input" />
-								<label asp-for="@Model.Roles[i].IsSelected" class="form-check-label">@Model.Roles[i].RoleName</label>
-							</div>
-						}
+							@for (int i = 0; i < Model.Roles.Count; i++)
+							{
+								<div class="form-check mb-2">
+									<input type="hidden" asp-for="@Model.Roles[i].RoleName" />
+									<input asp-for="@Model.Roles[i].IsSelected" class="form-check-input" />
+									<label asp-for="@Model.Roles[i].IsSelected" class="form-check-label">@Model.Roles[i].RoleName</label>
+								</div>
+							}
 
-						<div asp-validation-summary="All" class="text-danger mt-2"></div>
+							<div asp-validation-summary="All" class="text-danger mt-2"></div>
+						</div>
+						<div class="form-card-footer d-flex justify-content-end gap-2">
+							<a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+							<button type="submit" class="btn btn-primary px-4">Save</button>
+						</div>
 					</div>
-					<div class="card-footer bg-white text-center">
-						<button type="submit" class="btn btn-primary px-4 mx-2">Save</button>
-						<a asp-action="Index" class="btn btn-outline-dark px-4 mx-2">Cancel</a>
-					</div>
-				</div>
-			</form>
+				</form>
+			</div>
 		</div>
 	</div>
 </div>

@@ -1,106 +1,113 @@
 ﻿@model IEnumerable<Order>
 @{
+	ViewData["Title"] = "My Orders";
 	int i = 0;
-}
-<style>
-	body {
-		background-color: #fff8e1;
-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-	}
 
-	.accordion-button {
-		background-color: #f0f0f0;
-		color: #333;
-	}
-
-	.accordion-header {
-		background-color: #ffe0b2;
-		border-radius: 6px;
-		padding: 0 10px;
-	}
-
-	.btn-icon {
-		padding: 5px 10px;
-	}
-</style>
-
-@if (Model != null)
-{
-	@foreach (var order in Model)
+	string BadgeClass(Order.OrderStatus status) => status switch
 	{
-		<label hidden>@(i += 1)</label>
-		<div class="accordion mt-3" id="accordionExample">
-			<div class="accordion-item">
+		Order.OrderStatus.Pendeing => "status-pending",
+		Order.OrderStatus.Processing => "status-processing",
+		Order.OrderStatus.UnderDelivery => "status-underdelivery",
+		Order.OrderStatus.Delivered => "status-delivered",
+		Order.OrderStatus.Cancelled => "status-cancelled",
+		_ => "status-pending"
+	};
+}
 
-				<h2 class="accordion-header d-flex justify-content-between align-items-center" id="heading@i">
-					<!-- Accordion toggle button -->
-					<button class="accordion-button collapsed flex-grow-1" type="button"
-							data-bs-toggle="collapse" data-bs-target="#@i"
-							aria-expanded="false" aria-controls="@i">
-						<span class="mx-2 fw-bold text-primary">#@i</span>
-						<span class="mx-2">@order.StartOrderDate.ToString("yyyy-MM-dd HH:mm")</span>
-						<span class="mx-2">@order.OrderStatuss</span>
-					</button>
+<div class="page-wrap">
+	<div class="container py-5">
+		<div class="page-header">
+			<h1>My Orders</h1>
+			<p class="page-subtitle">Track and manage your orders.</p>
+		</div>
 
-					<!-- Action buttons outside toggle -->
-					<div class="d-flex align-items-center px-2">
-						@if (order.OrderStatuss == Order.OrderStatus.Pendeing)
-						{
-							<a asp-action="Delete" asp-controller="Order" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-danger mx-1" title="Delete">
-								<i class="bi bi-trash3"></i>
-							</a>
-						}
-					</div>
-				</h2>
+		@if (Model != null && Model.Any())
+		{
+			@foreach (var order in Model)
+			{
+				i++;
+				<div class="order-card">
+					<h2 class="order-card-header">
+						<button class="flex-grow-1 d-flex flex-wrap align-items-center gap-3 text-start bg-transparent border-0 accordion-button collapsed"
+								type="button" data-bs-toggle="collapse" data-bs-target="#orderBody@i" aria-expanded="false" aria-controls="orderBody@i">
+							<span class="order-number">#@order.OrderId</span>
+							<span class="order-meta">
+								<span class="meta-item"><i class="bi bi-calendar-event"></i>@order.StartOrderDate.ToString("yyyy-MM-dd HH:mm")</span>
+								<span class="meta-item"><i class="bi bi-pin-map"></i>@order.Address</span>
+							</span>
+							<span class="status-badge @BadgeClass(order.OrderStatuss)">@order.OrderStatuss</span>
+						</button>
+						<span class="order-actions">
+							@if (order.OrderStatuss == Order.OrderStatus.Pendeing)
+							{
+								<a asp-action="Delete" asp-controller="Order" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-danger" title="Delete order"><i class="bi bi-trash3"></i></a>
+							}
+						</span>
+					</h2>
 
-				<div id="@i" class="accordion-collapse collapse" aria-labelledby="heading@i" data-bs-parent="#accordionExample">
-					<div class="accordion-body">
-						<table class="table table-bordered shadow-sm">
-							<thead class="table-dark text-center">
-								<tr>
-									<td>Name</td>
-									<td>Quantity</td>
-									<td>Unit Price</td>
-									<td>Total Price</td>
-								</tr>
-							</thead>
-							<tbody class="table-light">
-								@foreach (var o in order.Orders)
-								{
-									<tr>
-										<td>@o.MenuName</td>
-										<td>@o.Quentity</td>
-										<td>@(o.Price / o.Quentity)</td>
-										<td>@o.Price</td>
-									</tr>
-								}
-							</tbody>
-						</table>
-						<h5 class="text-end px-3">Total Amount: <strong>@order.TotalAmount</strong></h5>
+					<div id="orderBody@i" class="accordion-collapse collapse">
+						<div class="order-card-body">
+							<div class="table-responsive">
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>Quantity</th>
+											<th>Unit Price</th>
+											<th class="text-end">Total Price</th>
+										</tr>
+									</thead>
+									<tbody>
+										@foreach (var o in order.Orders)
+										{
+											<tr>
+												<td>@o.MenuName</td>
+												<td>@o.Quentity</td>
+												<td>@(o.Price / o.Quentity)</td>
+												<td class="text-end fw-semibold">@o.Price</td>
+											</tr>
+										}
+									</tbody>
+								</table>
+							</div>
+							<div class="order-total">
+								<span>Total Amount</span>
+								<span class="amount">@order.TotalAmount ل.س</span>
+							</div>
+						</div>
 					</div>
 				</div>
+			}
 
+			<nav class="mt-4">
+				<ul class="pagination justify-content-center">
+					@if (ViewBag.CurrentPage > 1)
+					{
+						<li class="page-item">
+							<a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1 })"><i class="bi bi-chevron-right me-1"></i>السابق</a>
+						</li>
+					}
+					@if (ViewBag.CurrentPage * 30 < ViewBag.TotalCount)
+					{
+						<li class="page-item">
+							<a class="page-link" href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1 })">التالي<i class="bi bi-chevron-left ms-1"></i></a>
+						</li>
+					}
+				</ul>
+			</nav>
+		}
+		else
+		{
+			<div class="empty-state">
+				<i class="bi bi-receipt empty-icon"></i>
+				<h3>No orders yet</h3>
+				<p>You haven't placed any orders. When you do, they will show up here.</p>
+				<a class="btn btn-primary" asp-controller="Menu" asp-action="IndexUser">Browse Menu</a>
 			</div>
-		</div>
-	}
-
-	<!-- Pagination -->
-	<div class="d-flex justify-content-center mt-4">
-		@if (ViewBag.CurrentPage > 1)
-		{
-			<a href="@Url.Action("Index", new { page = ViewBag.CurrentPage - 1 })" class="btn btn-outline-secondary mx-2">السابق</a>
-		}
-		@if (ViewBag.CurrentPage * 30 < ViewBag.TotalCount)
-		{
-			<a href="@Url.Action("Index", new { page = ViewBag.CurrentPage + 1 })" class="btn btn-outline-secondary mx-2">التالي</a>
 		}
 	</div>
-}
+</div>
 
-@if (Model == null || !Model.Any())
-{
-	<div class="text-center mt-5">
-		<img src="~/Images/empty-cart.png" class="img-fluid" alt="No orders" style="max-width: 300px;" />
-		<h4 class="mt-3 text-muted">لا توجد طلبات</h4>
-	</div>
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
 }

@@ -4,7 +4,11 @@
     ViewData["Title"] = "Locked out";
 }
 
-<header>
-    <h1 class="text-danger">@ViewData["Title"]</h1>
-    <p class="text-danger">This account has been locked out, please try again later.</p>
-</header>
+<div class="result-page">
+	<div class="result-card">
+		<div class="result-icon bg-danger-soft text-danger"><i class="bi bi-lock-fill"></i></div>
+		<h1 class="h4 mb-3">@ViewData["Title"]</h1>
+		<p class="text-muted mb-0">This account has been locked out. Please try again later.</p>
+		<a class="btn btn-outline-primary mt-4" asp-page="./Login">Back to Login</a>
+	</div>
+</div>

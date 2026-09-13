@@ -1,153 +1,156 @@
 ﻿<!DOCTYPE html>
-
-<html lang="en">
+<html lang="en" dir="ltr">
 <head>
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>@ViewData["Title"] - OrderITDemo</title>
-	<script type="importmap"></script>
+	<title>@ViewData["Title"] - OrderIt</title>
+	<link rel="icon" type="image/png" href="~/Images/FoodLogo.png" />
 
 	<link href="~/lib/leaflet/leaflet.css" rel="stylesheet" />
-	<link href="~/lib/leaflet/leaflet.min.css" rel="stylesheet" />
 	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Matemasie&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 	<link rel="stylesheet" href="~/OrderITDemo.styles.css" asp-append-version="true" />
-	<style>
-		svg:hover {
-			fill: orange;
-			transform: scale(1.4);
-			transition: 0.25s;
-		}
-
-		a:hover {
-			fill: orangered;
-			transform: scale(1.1);
-			transition: 0.25s;
-		}
-	</style>
 </head>
 <body>
-	<header>
-		<nav class="navbar  navbar-expand-md navbar-light  shadow-sm" style="background-color:darkorange;">
-			<div class="container-fluid">
+	@{
+		var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+		var navbarBrand = "OrderIt";
+		string IsActive(string name) => controller == name ? "active" : "";
+	}
+	<header class="site-header">
+		<nav class="navbar navbar-expand-lg site-navbar">
+			<div class="container">
+				<a class="navbar-brand brand" asp-area="" asp-controller="Home" asp-action="Index">
+					<img src="~/Images/FoodLogo.png" alt="@navbarBrand logo" class="brand-logo" />
+					<span class="brand-text">@navbarBrand</span>
+				</a>
 
-				<a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index" style="color:white;">OrderITDemo</a>
-				<button class="navbar-toggler text-dark" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-						aria-expanded="false" aria-label="Toggle navigation">
-					<span class="navbar-toggler-icon"></span>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+						aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+					<i class="bi bi-list fs-3"></i>
 				</button>
-				<div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-					<ul class="navbar-nav mx-auto">
+
+				<div class="collapse navbar-collapse" id="mainNav">
+					<ul class="navbar-nav mx-auto mb-2 mb-lg-0">
 						<li class="nav-item">
-							<a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+							<a class="nav-link @IsActive("Home")" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+							<a class="nav-link @IsActive("Menu")" asp-area="" asp-controller="Menu" asp-action="IndexUser">Menu</a>
 						</li>
+
 						@if (User.IsInRole("Admin"))
 						{
-							@*  <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Role" asp-action="Index">Mange Roles</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="User" asp-action="Index">Manage User</a>
-                            </li> *@
 							<li class="nav-item dropdown">
-								<a class="nav-link dropdown-toggle text-dark" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Manage Users</a>
-								<div class="dropdown-menu">
-									<a class="dropdown-item" asp-controller="Role" asp-action="Index">Mange Roles </a>
-									<a class="dropdown-item" asp-controller="User" asp-action="Index">Manage User</a>
-									<div class="dropdown-divider"></div>
-								</div>
+								<a class="nav-link dropdown-toggle @IsActive("Role")" href="#" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Manage Users</a>
+								<ul class="dropdown-menu">
+									<li><a class="dropdown-item" asp-controller="Role" asp-action="Index"><i class="bi bi-person-badge me-2"></i>Manage Roles</a></li>
+									<li><a class="dropdown-item" asp-controller="User" asp-action="Index"><i class="bi bi-people me-2"></i>Manage Users</a></li>
+								</ul>
 							</li>
 							<li class="nav-item dropdown">
-								<a class="nav-link dropdown-toggle text-dark" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Manage Category</a>
-								<div class="dropdown-menu">
-									<a class="dropdown-item" asp-controller="Category" asp-action="Index">Show Category </a>
-									<a class="dropdown-item" asp-controller="Category" asp-action="Add">Add Category</a>
-									<div class="dropdown-divider"></div>
-								</div>
+								<a class="nav-link dropdown-toggle @IsActive("Category")" href="#" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Categories</a>
+								<ul class="dropdown-menu">
+									<li><a class="dropdown-item" asp-controller="Category" asp-action="Index"><i class="bi bi-collection me-2"></i>All Categories</a></li>
+									<li><a class="dropdown-item" asp-controller="Category" asp-action="Add"><i class="bi bi-plus-circle me-2"></i>Add Category</a></li>
+								</ul>
 							</li>
 							<li class="nav-item dropdown">
-								<a class="nav-link dropdown-toggle text-dark" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Manage Menu</a>
-								<div class="dropdown-menu">
-									<a class="dropdown-item" asp-controller="Menu" asp-action="Index">Show Menu </a>
-									<a class="dropdown-item" asp-controller="Menu" asp-action="Add">Add Menu</a>
-									<div class="dropdown-divider"></div>
-								</div>
+								<a class="nav-link dropdown-toggle @IsActive("Menu")" href="#" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Manage Menu</a>
+								<ul class="dropdown-menu">
+									<li><a class="dropdown-item" asp-controller="Menu" asp-action="Index"><i class="bi bi-grid me-2"></i>All Items</a></li>
+									<li><a class="dropdown-item" asp-controller="Menu" asp-action="Add"><i class="bi bi-plus-circle me-2"></i>Add Item</a></li>
+								</ul>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="ManageOrders">Orders</a>
+								<a class="nav-link @(controller == "Order" ? "active" : "")" asp-controller="Order" asp-action="ManageOrders"><i class="bi bi-box-seam me-1"></i>Orders</a>
 							</li>
 						}
 
-						<li class="nav-item">
-							<a class="nav-link text-dark" asp-area="" asp-controller="Menu" asp-action="IndexUser">Menu</a>
-						</li>
 						@if (User.IsInRole("User"))
 						{
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="Index">My Orders</a>
+								<a class="nav-link @(controller == "Order" && (ViewContext.RouteData.Values["action"]?.ToString() ?? "") == "Index" ? "active" : "")" asp-controller="Order" asp-action="Index"><i class="bi bi-receipt me-1"></i>My Orders</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-area="" asp-controller="Cart" asp-action="Index">
-									<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-cart" viewBox="0 0 16 16">
-										<path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
-									</svg>
+								<a class="nav-link icon-link @(controller == "Cart" ? "active" : "")" asp-controller="Cart" asp-action="Index" aria-label="Shopping cart">
+									<i class="bi bi-cart3 fs-5"></i>
 								</a>
 							</li>
 						}
+
 						@if (User.IsInRole("Delivery"))
 						{
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="DriverIndex">Processing Orders</a>
+								<a class="nav-link @(controller == "Order" && (ViewContext.RouteData.Values["action"]?.ToString() ?? "") == "DriverIndex" ? "active" : "")" asp-controller="Order" asp-action="DriverIndex"><i class="bi bi-clock-history me-1"></i>Processing Orders</a>
 							</li>
 							<li class="nav-item">
-								<a class="nav-link text-dark" asp-area="" asp-controller="Order" asp-action="DriverOrders">Accepted Orders</a>
+								<a class="nav-link @(controller == "Order" && (ViewContext.RouteData.Values["action"]?.ToString() ?? "") == "DriverOrders" ? "active" : "")" asp-controller="Order" asp-action="DriverOrders"><i class="bi bi-truck me-1"></i>Accepted Orders</a>
 							</li>
 						}
-
 					</ul>
+
 					<partial name="_LoginPartial" />
 				</div>
 			</div>
 		</nav>
 	</header>
-	<div class="container mb-5">
-		<main role="main" class="pb-3">
+
+	<div class="page-shell">
+		<main class="page-wrap">
 			@RenderBody()
 		</main>
+
+		<footer class="site-footer">
+			<div class="container">
+				<div class="footer-grid">
+					<div class="footer-col">
+						<a class="brand" asp-area="" asp-controller="Home" asp-action="Index">
+							<img src="~/Images/FoodLogo.png" alt="OrderIt logo" class="brand-logo" />
+							<span class="brand-text">OrderIt</span>
+						</a>
+						<p class="footer-about">Fresh food, fast delivery. Discover restaurants and more near you.</p>
+					</div>
+
+					<div class="footer-col">
+						<h4>Quick Links</h4>
+						<ul class="footer-links">
+							<li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+							<li><a asp-area="" asp-controller="Menu" asp-action="IndexUser">Menu</a></li>
+							<li><a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy Policy</a></li>
+						</ul>
+					</div>
+
+					<div class="footer-col">
+						<h4>Contact Us</h4>
+						<ul class="footer-links">
+							<li><a href="mailto:sarg10nofal10@gmail.com"><i class="bi bi-envelope me-2"></i>sarg10nofal10@gmail.com</a></li>
+							<li><a href="tel:+970993735995"><i class="bi bi-telephone me-2"></i>0993735995</a></li>
+						</ul>
+					</div>
+
+					<div class="footer-col">
+						<h4>Follow Us</h4>
+						<div class="footer-social">
+							<a href="https://www.facebook.com/saad.nofal.90" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+							<a href="https://www.instagram.com/saad_eddin_nofal/" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+						</div>
+					</div>
+				</div>
+				<div class="footer-bottom">
+					<p>&copy; @DateTime.Now.Year OrderIt. All rights reserved.</p>
+				</div>
+			</div>
+		</footer>
 	</div>
 
-
-
-	<footer class="footer text-muted" style="background-color:darkorange; ">
-		<div class="container">
-			&copy; 2025 - OrderITDemo - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-			<a href="https://www.facebook.com/saad.nofal.90">  <img class="mx-3 rounded-circle Button-profile product-image" src="~/Images/Facebook.jpeg" /></a>
-			<a href="https://www.instagram.com/saad_eddin_nofal/">  <img class="rounded-circle Button-profile product-image" src="~/Images/Instagram.jpeg" /></a>
-		</div>
-	</footer>
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
 	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
 	@await RenderSectionAsync("Scripts", required: false)
-	@* <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-		<div class="modal-dialog modal-lg">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h1 class="modal-title fs-5" id="staticBackdropLabel">تسجيل الدخول</h1>
-					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-				</div>
-				<div class="modal-body modal-dialog-scrollable" style="background-color:#f7f7f9">
-					<partial name="_LoginPartialView"></partial>
-				</div>
-			</div>
-		</div>
-	</div> *@
 </body>
 </html>

@@ -1,106 +1,116 @@
 ﻿@model IEnumerable<Order>
 @{
+	
+	Layout = "_AdminLayout";
+	ViewData["Title"] = "Processing Orders";
 	int i = 0;
-}
-<style>
-	.my-div {
-		width: 100%;
-		height: 40px;
-		position: relative;
-		font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-		color: darkblue;
-		font-weight: bolder
-	}
 
-	body {
-		background-color: darkorange
-	}
-</style>
-@* <img class="bkimg" src="~/Images/BKORANGE.jpg" /> *@
-
-@if (Model != null)
-{
-	@foreach (var order in Model)
+	string BadgeClass(Order.OrderStatus status) => status switch
 	{
-		<label hidden>@(i += 1)</label>
-		<div class="accordion mt-2" id="accordionExample">
-			<div class="accordion-item	">
-				<h2 class="accordion-header" id="headingOne">
-					<div style="display: flex; align-items: center;">
-						<button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@i" aria-expanded="true" aria-controls="@i" style="width:90%">
-							<span class="mx-3">@(i)</span>
-							<span class="mx-3">@order.StartOrderDate</span>
-							<span>@order.OrderStatuss</span>
-							@if (order.OrderStatuss == Order.OrderStatus.UnderDelivery)
-							{
-								<span class="mx-1"> at @order.StartDeliveryDate </span>
-							}
-							<span class="mx-3">@order.User?.FirstName</span>
-							<span class="mx-3">@order.User?.PhoneNumber</span>
-							<span class="mx-3">@order.Address</span>
-						</button>
-						
-						@if (order.DeliveryId == null)
-						{
-							<a asp-action="IsTaken" asp-controller="Order" asp-route-id="@order.OrderId" class="btn btn-danger btn-sm mx-3">
-								<i class="bi bi-check-lg"></i>
-							</a>
-						}
+		Order.OrderStatus.Pendeing => "status-pending",
+		Order.OrderStatus.Processing => "status-processing",
+		Order.OrderStatus.UnderDelivery => "status-underdelivery",
+		Order.OrderStatus.Delivered => "status-delivered",
+		Order.OrderStatus.Cancelled => "status-cancelled",
+		_ => "status-pending"
 
+	};
+}
 
-					</div>
-				</h2>
-				<div id="@i" class="accordion-collapse collapse " aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-					<div class="accordion-body">
-						<table class="table table-bordered shadow-lg">
-							<thead class="table-dark">
-								<tr>
-									<td>Name</td>
-									<td>Quentity</td>
-									<td>Price</td>
-									<td>Total price</td>
-
-								</tr>
-							</thead>
-
-							@foreach (var o in order.Orders)
-							{
-
-								<tbody class="table-info">
-
-									<tr>
-										<td>@o.MenuName</td>
-										<td>@o.Quentity</td>
-										<td>@(o.Price / o.Quentity)</td>
-										<td>@o.Price</td>
-
-									</tr>
-
-								</tbody>
-
-							}
-						</table>
-					</div>
-
-					<h5 class="mx-3">Total Amount:  @order.TotalAmount</h5>
-
-				</div>
-
-			</div>
+<div class="page-wrap">
+	<div class="container py-5">
+		<div class="page-header">
+			<h1>Processing Orders</h1>
+			<p class="page-subtitle">Orders ready to be picked up for delivery.</p>
 		</div>
 
-
-	}
-	<div>
-		@if (ViewBag.CurrentPage > 1)
+		@if (Model != null && Model.Any())
 		{
-			<a href="@Url.Action("ManageOrders", new { page = ViewBag.CurrentPage - 1 })">السابق</a>
+			@foreach (var order in Model)
+			{
+				i++;
+				<div class="order-card">
+					<h2 class="order-card-header">
+						<button class="flex-grow-1 d-flex flex-wrap align-items-center gap-3 text-start bg-transparent border-0 accordion-button collapsed"
+								type="button" data-bs-toggle="collapse" data-bs-target="#orderBody@i" aria-expanded="false" aria-controls="orderBody@i">
+							<span class="order-number">#@order.OrderId</span>
+							<span class="order-meta">
+								<span class="meta-item"><i class="bi bi-calendar-event"></i>@order.StartOrderDate.ToString("yyyy-MM-dd HH:mm")</span>
+								<span class="meta-item"><i class="bi bi-person"></i>@order.User?.FirstName - @order.User?.PhoneNumber</span>
+								<span class="meta-item"><i class="bi bi-geo-alt"></i>@order.Address</span>
+							</span>
+							<span class="status-badge @BadgeClass(order.OrderStatuss)">@order.OrderStatuss</span>
+						</button>
+						<span class="order-actions">
+							@if (order.DeliveryId == null)
+							{
+								<a asp-action="IsTaken" asp-controller="Order" asp-route-id="@order.OrderId" class="btn btn-sm btn-primary" title="Accept for delivery"><i class="bi bi-bicycle me-1"></i>Take Order</a>
+							}
+						</span>
+					</h2>
+
+					<div id="orderBody@i" class="accordion-collapse collapse">
+						<div class="order-card-body">
+							<div class="table-responsive">
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>Quantity</th>
+											<th>Unit Price</th>
+											<th class="text-end">Total Price</th>
+										</tr>
+									</thead>
+									<tbody>
+										@foreach (var o in order.Orders)
+										{
+											<tr>
+												<td>@o.MenuName</td>
+												<td>@o.Quentity</td>
+												<td>@(o.Price / o.Quentity)</td>
+												<td class="text-end fw-semibold">@o.Price</td>
+											</tr>
+										}
+									</tbody>
+								</table>
+							</div>
+							<div class="order-total">
+								<span>Total Amount</span>
+								<span class="amount">@order.TotalAmount ل.س</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
+
+			<nav class="mt-4">
+				<ul class="pagination justify-content-center">
+					@if (ViewBag.CurrentPage > 1)
+					{
+						<li class="page-item">
+							<a class="page-link" href="@Url.Action("DriverIndex", new { page = ViewBag.CurrentPage - 1 })"><i class="bi bi-chevron-right me-1"></i>السابق</a>
+						</li>
+					}
+					@if (ViewBag.CurrentPage * 30 < ViewBag.TotalCount)
+					{
+						<li class="page-item">
+							<a class="page-link" href="@Url.Action("DriverIndex", new { page = ViewBag.CurrentPage + 1 })">التالي<i class="bi bi-chevron-left ms-1"></i></a>
+						</li>
+					}
+				</ul>
+			</nav>
 		}
-
-		@if (ViewBag.CurrentPage * 30 < ViewBag.TotalCount)
+		else
 		{
-			<a href="@Url.Action("ManageOrders", new { page = ViewBag.CurrentPage + 1 })">التالي</a>
+			<div class="empty-state">
+				<i class="bi bi-truck empty-icon"></i>
+				<h3>No orders available</h3>
+				<p>There are no orders waiting to be picked up right now.</p>
+			</div>
 		}
 	</div>
+</div>
 
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
 }

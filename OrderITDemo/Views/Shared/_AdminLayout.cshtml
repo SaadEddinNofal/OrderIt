@@ -1,0 +1,150 @@
+@using Microsoft.AspNetCore.Identity
+@using OrderITDemo.Models
+@inject SignInManager<AppUser> SignInManager
+@inject UserManager<AppUser> UserManager
+@inject IConfiguration Config
+@{
+	string Trim(string? s) => string.IsNullOrWhiteSpace(s) ? "" : s.Trim();
+	string Brand(string key) => Trim(Config[$"Branding:{key}"]);
+	var siteName = Brand("Name");
+	if (string.IsNullOrEmpty(siteName)) siteName = "OrderIt";
+	var tagline = Brand("Tagline");
+	if (string.IsNullOrEmpty(tagline)) tagline = "Fresh food, fast delivery.";
+	var supportEmail = Brand("SupportEmail");
+	if (string.IsNullOrEmpty(supportEmail)) supportEmail = "sarg10nofal10@gmail.com";
+	var supportPhone = Brand("SupportPhone");
+	if (string.IsNullOrEmpty(supportPhone)) supportPhone = "0993735995";
+
+	var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+	var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+
+	string IsSection(string name) => controller == name ? "active" : "";
+	string IsAction(string name) => string.Equals(controller, "Order", StringComparison.OrdinalIgnoreCase) && action == name ? "active" : "";
+}
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>@ViewData["Title"] - @siteName</title>
+	<link rel="icon" type="image/png" href="~/Images/FoodLogo.png" />
+
+	<link href="~/lib/leaflet/leaflet.css" rel="stylesheet" />
+	<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+	<link rel="stylesheet" href="~/OrderITDemo.styles.css" asp-append-version="true" />
+</head>
+<body>
+	<div class="page-shell">
+		<header class="site-header">
+			<nav class="navbar navbar-expand-lg site-navbar">
+				<div class="container-fluid px-lg-4">
+					<a class="brand" asp-controller="Home" asp-action="Index">
+						<img src="~/Images/FoodLogo.png" class="brand-logo" alt="@siteName logo" />
+						<span class="brand-text">@siteName</span>
+					</a>
+
+					<button id="sidebarToggleBtn" class="btn btn-outline-secondary sidebar-toggle" type="button" aria-controls="adminSidebar" aria-expanded="false" aria-label="Toggle sidebar">
+						<i class="bi bi-layout-sidebar"></i>
+					</button>
+
+					<div class="ms-auto d-flex align-items-center gap-2">
+						@if (User.IsInRole("Delivery"))
+						{
+							<span class="role-badge delivery"><i class="bi bi-bicycle me-1"></i>Delivery</span>
+						}
+						<div class="user-chip">
+							@if (UserManager.GetUserAsync(User).Result.ProfilePicture != null)
+							{
+								<img class="nav-avatar" src="data:image/*;base64,@(Convert.ToBase64String(UserManager.GetUserAsync(User).Result.ProfilePicture))" alt="Profile" />
+							}
+							else
+							{
+								<img class="nav-avatar" src="~/Images/Profile.jpg" alt="Profile" />
+							}
+							<span class="d-none d-md-inline" title="Manage"><a asp-area="Identity" asp-page="/Account/Manage/Index" class="text-reset text-decoration-none">Hello @User.Identity?.Name!</a></span>
+						</div>
+						<form class="logout-link" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+							<button type="submit" class="btn btn-outline-secondary btn-sm" title="Logout"><i class="bi bi-box-arrow-right"></i></button>
+						</form>
+					</div>
+				</div>
+			</nav>
+		</header>
+
+		<div class="admin-shell">
+			<aside id="adminSidebar" class="admin-sidebar">
+				<div class="admin-sidebar-body">
+					<div class="admin-sidebar-section">
+						<div class="admin-sidebar-label">Overview</div>
+						<a class="admin-sidebar-link @IsAction("Dashboard")" asp-controller="Admin" asp-action="Dashboard"><i class="bi bi-speedometer2"></i>Dashboard</a>
+					</div>
+
+					@if (User.IsInRole("Admin"))
+					{
+						<div class="admin-sidebar-section">
+							<div class="admin-sidebar-label">Administration</div>
+							<a class="admin-sidebar-link @IsSection("User")" asp-controller="User" asp-action="Index"><i class="bi bi-people"></i>Manage Users</a>
+							<a class="admin-sidebar-link @IsSection("Role")" asp-controller="Role" asp-action="Index"><i class="bi bi-person-badge"></i>Manage Roles</a>
+						</div>
+
+						<div class="admin-sidebar-section">
+							<div class="admin-sidebar-label">Content</div>
+							<a class="admin-sidebar-link @IsSection("Category")" asp-controller="Category" asp-action="Index"><i class="bi bi-collection"></i>Categories</a>
+							<a class="admin-sidebar-link @IsSection("Menu")" asp-controller="Menu" asp-action="Index"><i class="bi bi-grid"></i>Menu Items</a>
+						</div>
+
+						<div class="admin-sidebar-section">
+							<div class="admin-sidebar-label">Operations</div>
+							<a class="admin-sidebar-link @IsAction("ManageOrders")" asp-controller="Order" asp-action="ManageOrders"><i class="bi bi-clipboard-check"></i>Manage Orders</a>
+						</div>
+					}
+
+					@if (User.IsInRole("Delivery"))
+					{
+						<div class="admin-sidebar-section">
+							<div class="admin-sidebar-label">Delivery</div>
+							<a class="admin-sidebar-link @IsAction("DriverIndex")" asp-controller="Order" asp-action="DriverIndex"><i class="bi bi-clock-history"></i>Processing Orders</a>
+							<a class="admin-sidebar-link @IsAction("DriverOrders")" asp-controller="Order" asp-action="DriverOrders"><i class="bi bi-box-seam"></i>Accepted Orders</a>
+						</div>
+					}
+				</div>
+
+				<div class="admin-sidebar-footer">
+					<div class="admin-user">
+						@if (UserManager.GetUserAsync(User).Result.ProfilePicture != null)
+						{
+							<img class="nav-avatar" src="data:image/*;base64,@(Convert.ToBase64String(UserManager.GetUserAsync(User).Result.ProfilePicture))" alt="Profile" />
+						}
+						else
+						{
+							<img class="nav-avatar" src="~/Images/Profile.jpg" alt="Profile" />
+						}
+						<div>
+							<div class="admin-user-name">@User.Identity?.Name</div>
+							<div class="admin-user-role">
+								@if (User.IsInRole("Admin")) { <text>Administrator</text> }
+								else if (User.IsInRole("Delivery")) { <text>Delivery Driver</text> }
+							</div>
+						</div>
+					</div>
+				</div>
+			</aside>
+
+			<main class="admin-content">
+				@RenderBody()
+			</main>
+		</div>
+	</div>
+
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

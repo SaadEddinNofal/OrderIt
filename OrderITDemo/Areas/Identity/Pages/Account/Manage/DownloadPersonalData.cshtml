@@ -5,8 +5,16 @@
     ViewData["ActivePage"] = ManageNavPages.PersonalData;
 }
 
-<h3>@ViewData["Title"]</h3>
+<h3 class="h5 mb-3">@ViewData["Title"]</h3>
+
+<div class="form-card">
+	<div class="form-card-body">
+		<div class="alert alert-info" role="alert">
+			<i class="bi bi-info-circle me-1"></i>Your personal data export is being prepared. You can download it by choosing a date range below.
+		</div>
+	</div>
+</div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+	<partial name="_ValidationScriptsPartial" />
 }

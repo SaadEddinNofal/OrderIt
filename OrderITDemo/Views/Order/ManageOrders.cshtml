@@ -1,141 +1,135 @@
 ﻿@model IEnumerable<Order>
 @{
-    int i = 0;
+	
+	Layout = "_AdminLayout";
+	ViewData["Title"] = "Manage Orders";
+	int i = 0;
+
+	string BadgeClass(Order.OrderStatus status) => status switch
+	{
+		Order.OrderStatus.Pendeing => "status-pending",
+		Order.OrderStatus.Processing => "status-processing",
+		Order.OrderStatus.UnderDelivery => "status-underdelivery",
+		Order.OrderStatus.Delivered => "status-delivered",
+		Order.OrderStatus.Cancelled => "status-cancelled",
+		_ => "status-pending"
+
+	};
 }
-<style>
-    body {
-        background-color: #fff8e1;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
 
-    .accordion-button {
-        background-color: #f8f9fa;
-        font-weight: 600;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-    }
+<div class="page-wrap">
+	<div class="container py-5">
+		<div class="page-header">
+			<h1>@ViewBag.DD</h1>
+			<p class="page-subtitle">Review, accept and manage customer orders.</p>
+		</div>
 
-    .accordion-body table td, .accordion-body table th {
-        vertical-align: middle;
-    }
+		<div class="filter-tabs">
+			<a class="filter-tab @(string.Equals(ViewBag.DD?.ToString(), "All Orders", StringComparison.OrdinalIgnoreCase) ? "active" : "")" asp-controller="Order" asp-action="ManageOrders">All</a>
+			<a class="filter-tab" asp-controller="Order" asp-action="PendeingOrder">Pending</a>
+			<a class="filter-tab" asp-controller="Order" asp-action="ProcessingOrder">Processing</a>
+			<a class="filter-tab" asp-controller="Order" asp-action="CancelOrder">Cancelled</a>
+		</div>
 
-    .order-actions {
-        margin-left: auto;
-        display: flex;
-        gap: 0.5rem;
-    }
+		@if (Model != null && Model.Any())
+		{
+			@foreach (var order in Model)
+			{
+				i++;
+				<div class="order-card">
+					<h2 class="order-card-header">
+						<button class="flex-grow-1 d-flex flex-wrap align-items-center gap-3 text-start bg-transparent border-0 accordion-button collapsed"
+								type="button" data-bs-toggle="collapse" data-bs-target="#orderBody@i" aria-expanded="false" aria-controls="orderBody@i">
+							<span class="order-number">#@order.OrderId</span>
+							<span class="order-meta">
+								<span class="meta-item"><i class="bi bi-calendar-event"></i>@order.StartOrderDate.ToString("yyyy-MM-dd HH:mm")</span>
+								<span class="meta-item"><i class="bi bi-person"></i>User: @order.User?.FirstName - @order.User?.PhoneNumber</span>
+								@if (order.DeliveryId != null)
+								{
+									<span class="meta-item"><i class="bi bi-truck"></i>Driver: @order.Delivery?.FirstName - @order.Delivery?.PhoneNumber</span>
+								}
+								@if (order.OrderStatuss == Order.OrderStatus.UnderDelivery && order.DeliveryId != null)
+								{
+									<span class="meta-item"><i class="bi bi-clock"></i>Started: @order.StartDeliveryDate</span>
+								}
+							</span>
+							<span class="status-badge @BadgeClass(order.OrderStatuss)">@order.OrderStatuss</span>
+						</button>
+						<span class="order-actions">
+							@if (order.OrderStatuss == Order.OrderStatus.Pendeing)
+							{
+								<a asp-action="DeleteAdmin" asp-controller="Order" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-danger" title="Delete"><i class="bi bi-trash3"></i></a>
+								<a asp-action="AcceptOrder" asp-controller="Order" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-success" title="Accept"><i class="bi bi-check-lg"></i></a>
+							}
+							@if (order.OrderStatuss == Order.OrderStatus.Processing)
+							{
+								<a asp-action="OnDelivery" asp-controller="Order" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-warning" title="Start Delivery"><i class="bi bi-truck"></i></a>
+							}
+						</span>
+					</h2>
 
-    .dropdown .btn {
-        font-weight: bold;
-    }
-</style>
+					<div id="orderBody@i" class="accordion-collapse collapse">
+						<div class="order-card-body">
+							<div class="table-responsive">
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<th>Name</th>
+											<th>Quantity</th>
+											<th>Unit Price</th>
+											<th class="text-end">Total</th>
+										</tr>
+									</thead>
+									<tbody>
+										@foreach (var o in order.Orders)
+										{
+											<tr>
+												<td>@o.MenuName</td>
+												<td>@o.Quentity</td>
+												<td>@(o.Price / o.Quentity)</td>
+												<td class="text-end fw-semibold">@o.Price</td>
+											</tr>
+										}
+									</tbody>
+								</table>
+							</div>
+							<div class="order-total">
+								<span>Total Amount</span>
+								<span class="amount">@order.TotalAmount ل.س</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			}
 
-<div class="container mt-4">
-
-    <div class="dropdown">
-        <button class="dropdown-toggle btn btn-outline-dark mb-4" data-bs-toggle="dropdown" aria-expanded="false">
-            @ViewBag.DD
-        </button>
-        <ul class="dropdown-menu">
-            <li><a class="dropdown-item" asp-controller="Order" asp-action="ManageOrders">All</a></li>
-            <li><a class="dropdown-item" asp-controller="Order" asp-action="CancelOrder">Canceled Orders</a></li>
-            <li><a class="dropdown-item" asp-controller="Order" asp-action="PendeingOrder">Pending Orders</a></li>
-            <li><a class="dropdown-item" asp-controller="Order" asp-action="ProcessingOrder">Processing Orders</a></li>
-        </ul>
-    </div>
-
-    @if (Model != null)
-    {
-        <div class="accordion" id="accordionExample">
-            @foreach (var order in Model)
-            {
-                i++;
-                <div class="accordion-item mb-3 shadow-sm">
-                    <h2 class="accordion-header d-flex justify-content-between align-items-center px-2" id="heading@i" style="gap: 10px;">
-                        <button class="accordion-button collapsed flex-grow-1" type="button" data-bs-toggle="collapse" data-bs-target="#@i" aria-expanded="false" aria-controls="@i">
-                            <span class="me-3 fw-bold text-primary">#@i</span>
-                            <span class="me-3">@order.StartOrderDate.ToString("yyyy-MM-dd HH:mm")</span>
-                            <span class="me-3">@order.OrderStatuss</span>
-
-                            @if (order.OrderStatuss == Order.OrderStatus.UnderDelivery && order.DeliveryId != null)
-                            {
-                                <span class="me-3 text-success">Driver: @order.Delivery.FirstName - @order.Delivery.PhoneNumber</span>
-                                <span class="me-3">Started: @order.StartDeliveryDate</span>
-                            }
-
-                            @if (order.OrderStatuss == Order.OrderStatus.Processing && order.DeliveryId != null)
-                            {
-                                <span class="me-3 text-success">Driver: @order.Delivery.FirstName - @order.Delivery.PhoneNumber</span>
-                            }
-
-                            <span class="me-3">User: @order.User?.FirstName - @order.User?.PhoneNumber</span>
-                        </button>
-
-                        <div class="order-actions d-flex gap-1 ms-2">
-                            @if (order.OrderStatuss == Order.OrderStatus.Pendeing)
-                            {
-                                <a asp-action="DeleteAdmin" asp-controller="Order" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-danger" title="Delete">
-                                    <i class="bi bi-trash3"></i>
-                                </a>
-                                <a asp-action="AcceptOrder" asp-controller="Order" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-success" title="Accept">
-                                    <i class="bi bi-check-lg"></i>
-                                </a>
-                            }
-                            @if (order.OrderStatuss == Order.OrderStatus.Processing)
-                            {
-                                <a asp-action="OnDelivery" asp-controller="Order" asp-route-id="@order.OrderId" class="btn btn-sm btn-outline-warning" title="Start Delivery">
-                                    <i class="bi bi-truck"></i>
-                                </a>
-                            }
-                        </div>
-                    </h2>
-
-                    <div id="@i" class="accordion-collapse collapse" aria-labelledby="heading@i" data-bs-parent="#accordionExample">
-                        <div class="accordion-body">
-                            <table class="table table-bordered table-hover text-center">
-                                <thead class="table-dark">
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Quantity</th>
-                                        <th>Unit Price</th>
-                                        <th>Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="table-light">
-                                    @foreach (var o in order.Orders)
-                                    {
-                                        <tr>
-                                            <td>@o.MenuName</td>
-                                            <td>@o.Quentity</td>
-                                            <td>@(o.Price / o.Quentity)</td>
-                                            <td>@o.Price</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                            <h5 class="text-end me-2">Total Amount: <span class="text-success fw-bold">@order.TotalAmount</span></h5>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-
-        <nav class="mt-4">
-            <ul class="pagination justify-content-center">
-                @if (ViewBag.CurrentPage > 1)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.Action("ManageOrders", new { page = ViewBag.CurrentPage - 1 })">السابق</a>
-                    </li>
-                }
-                @if (ViewBag.CurrentPage * 30 < ViewBag.TotalCount)
-                {
-                    <li class="page-item">
-                        <a class="page-link" href="@Url.Action("ManageOrders", new { page = ViewBag.CurrentPage + 1 })">التالي</a>
-                    </li>
-                }
-            </ul>
-        </nav>
-    }
+			<nav class="mt-4">
+				<ul class="pagination justify-content-center">
+					@if (ViewBag.CurrentPage > 1)
+					{
+						<li class="page-item">
+							<a class="page-link" href="@Url.Action("ManageOrders", new { page = ViewBag.CurrentPage - 1 })"><i class="bi bi-chevron-right me-1"></i>السابق</a>
+						</li>
+					}
+					@if (ViewBag.CurrentPage * 30 < ViewBag.TotalCount)
+					{
+						<li class="page-item">
+							<a class="page-link" href="@Url.Action("ManageOrders", new { page = ViewBag.CurrentPage + 1 })">التالي<i class="bi bi-chevron-left ms-1"></i></a>
+						</li>
+					}
+				</ul>
+			</nav>
+		}
+		else
+		{
+			<div class="empty-state">
+				<i class="bi bi-inbox empty-icon"></i>
+				<h3>No orders found</h3>
+				<p>There are no orders in this view right now.</p>
+			</div>
+		}
+	</div>
 </div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+}

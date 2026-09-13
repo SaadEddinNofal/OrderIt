@@ -1,37 +1,53 @@
 ﻿@model IEnumerable<IdentityRole>
 @{
-    ViewData["Title"] = "The Roles";
-}
-<div class="container">
-   
-    <partial name="_RoleForm" model="new RoleFormViewModel()" />
+    
+	Layout = "_AdminLayout";
+	ViewData["Title"] = "The Roles";
 
-  
-    <div class="table-responsive mt-4">
-        <table class="table table-striped shadow-lg mb-0">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Role Name</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var role in Model)
-                {
-                    <tr>
-                        <td>@role.Id</td>
-                        <td>@role.Name</td>
-                        <td>
-                            <a asp-action="Delete" asp-controller="Role" class="btn btn-danger btn-sm" asp-route-id="@role.Id">Delete</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+}
+
+<div class="page-wrap">
+	<div class="container py-5">
+		<div class="page-header">
+			<h1>@ViewData["Title"]</h1>
+			<p class="page-subtitle">Define the roles used across the application.</p>
+		</div>
+
+		<div class="form-card mb-4">
+			<div class="form-card-header">
+				<h2 class="h6 mb-0">Add New Role</h2>
+			</div>
+			<div class="form-card-body">
+				<partial name="_RoleForm" model="new RoleFormViewModel()" />
+			</div>
+		</div>
+
+		<div class="data-table table-responsive">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>Role Name</th>
+						<th class="text-end">Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var role in Model)
+					{
+						<tr>
+							<td>@role.Id</td>
+							<td>@role.Name</td>
+							<td class="text-end">
+								<a asp-action="Delete" asp-controller="Role" class="btn btn-sm btn-outline-danger" asp-route-id="@role.Id"><i class="bi bi-trash me-1"></i>Delete</a>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}  
+	<partial name="_ValidationScriptsPartial" />
+}
