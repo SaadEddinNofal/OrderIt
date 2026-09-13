@@ -21,7 +21,14 @@ var smtpServer = emailSettings["SmtpServer"];
 var port = int.Parse(emailSettings["Port"]);*/
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
+        "Connection string 'DefaultConnection' is missing or empty. " +
+        "Set the 'ConnectionStrings__DefaultConnection' environment variable on the server, " +
+        "or add it to appsettings.json.");
+}
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
