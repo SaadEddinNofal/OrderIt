@@ -24,10 +24,46 @@ var port = int.Parse(emailSettings["Port"]);*/
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(connectionString))
 {
+    try
+    {
+        var diag = new System.Text.StringBuilder();
+        var contentRoot = builder.Environment.ContentRootPath;
+        var envName = builder.Environment.EnvironmentName;
+        var settingsPath = System.IO.Path.Combine(contentRoot, "appsettings.json");
+        var settingsExists = System.IO.File.Exists(settingsPath);
+        var envVar = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection");
+        var currentDir = Directory.GetCurrentDirectory();
+
+        diag.AppendLine("[OrderIt startup diagnostic]");
+        diag.AppendLine($"Time          : {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+        diag.AppendLine($"Environment   : {envName}");
+        diag.AppendLine($"ContentRoot   : {contentRoot}");
+        diag.AppendLine($"CurrentDir    : {currentDir}");
+        diag.AppendLine($"appsettings   : {settingsPath}");
+        diag.AppendLine($"appsettings exists: {settingsExists}");
+        diag.AppendLine($"env var 'ConnectionStrings__DefaultConnection' present: {(envVar is null ? "NO (null)" : envVar.Length == 0 ? "YES (empty)" : "YES (has value)")}");
+diag.AppendLine("----- PROVIDERS (key 'ConnectionStrings:DefaultConnection'; value redacted) -----");
+var root = (builder.Configuration as IConfigurationRoot);
+if (root is not null)
+{
+    foreach (var provider in root.Providers)
+    {
+        var ok = provider.TryGet("ConnectionStrings:DefaultConnection", out _);
+        diag.AppendLine($"  [{provider.GetType().Name}] contains key: {(ok ? "YES" : "no")}");
+    }
+}
+        var diagPath = System.IO.Path.Combine(contentRoot, "startup-diag.txt");
+        System.IO.File.WriteAllText(diagPath, diag.ToString());
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[OrderIt] Failed to write startup diagnostic: {ex.Message}");
+    }
+
     throw new InvalidOperationException(
         "Connection string 'DefaultConnection' is missing or empty. " +
         "Set the 'ConnectionStrings__DefaultConnection' environment variable on the server, " +
-        "or add it to appsettings.json.");
+        "or add it to appsettings.json. A diagnostic file 'startup-diag.txt' was written next to the app — open it to see what the app actually loaded.");
 }
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
